@@ -3,7 +3,7 @@ from bitcoinutils.keys import P2pkhAddress, PrivateKey, PublicKey
 
 def main():
     # always remember to setup the network
-    setup('mainnet')
+    setup('testnet')
 
     # create a private key (deterministically)
     priv = PrivateKey(secret_exponent = 1)
