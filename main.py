@@ -11,7 +11,7 @@ def main():
     # compressed is the default
     print("\nPrivate key WIF:", priv.to_wif(compressed=True))
 
-    # could also instantiate from existing WIF key
+    # could also instantiate from existing WIF
     #priv = PrivateKey.from_wif('KwDiBf89qGgbjEhKnhxjUh7LrciVRzI3qYjgd9m7Rfu73SvHnOwn')
 
     # get the public key
