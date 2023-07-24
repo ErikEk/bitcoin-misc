@@ -39,6 +39,7 @@ def main():
         print("The signature is valid!")
     else:
         print("The signature is NOT valid!")
+    print("t")
 
 
 if __name__ == "__main__":
