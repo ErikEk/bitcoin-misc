@@ -62,6 +62,8 @@ def main():
     # tapleaf script p2pk script
     privkey_tr_script = PrivateKey('cQwzrJyTNWbEwhPEmQ3Qoo4jSfHdHEtdbL4kNBgHUKhirgzcQw7G')
     pubkey_tr_script = privkey_tr_script.get_public_key()
+    print(type(pubkey_tr_script))
+    print(dir(pubkey_tr_script))
     tr_script_p2pk = Script([pubkey_tr_script.to_x_only_hex(), 'OP_CHECKSIG'])
 
     # taproot script path address
