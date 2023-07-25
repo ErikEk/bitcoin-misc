@@ -1,4 +1,3 @@
-#source .venv/taproot/bin/activate
 
 from bitcoinutils.setup import setup
 from bitcoinutils.utils import to_satoshis
@@ -11,16 +10,13 @@ def main():
     # always remember to setup the network
     setup('testnet')
 
-    # Keys are hard-coded in the example for simplicity but it is very bad
-    # practice. Normally you would acquire them from env variables, db, etc.
-
     #######################
     # Construct the input #
     #######################
 
     # get an HDWallet wrapper object by extended private key and path
     xprivkey = "tprv8ZgxMBicQKsPdQR9RuHpGGxSnNq8Jr3X4WnT6Nf2eq7FajuXyBep5KWYpYEixxx5XdTm1Ntpe84f3cVcF7mZZ7mPkntaFXLGJD2tS7YJkWU"
-    path = "m/86'/1'/0'/0/6"
+    path = "m/86'/1'/0'/0/5"
     hdw = HDWallet(xprivkey, path)
     internal_priv = hdw.get_private_key()
     print('From Private key:', internal_priv.to_wif())
@@ -31,16 +27,16 @@ def main():
     from_address = internal_pub.get_taproot_address()
     print('From Taproot address:', from_address.to_string())
 
-    # UTXO of from address
-    txid = '67e8c015625279f2d4268a7b15e8a6feef39a86ed4f5c14acbd260f612b8c44a'
-    vout = 1
+    # UTXO of fromAddress
+    txid = '29afd65f1aeeab4e4d655b148776fe0097acc617492b0c3f3950b6a95be20f39'
+    vout = 0
 
     # create transaction input from tx id of UTXO
     tx_in = TxInput(txid, vout)
 
     # all amounts are needed to sign a taproot input
     # (depending on sighash)
-    amount = to_satoshis(0.00009658)
+    amount = to_satoshis(0.00004)
     amounts = [ amount ]
 
     # all scriptPubKeys (in hex) are needed to sign a taproot input 
@@ -54,24 +50,40 @@ def main():
 
     hdw.from_path("m/86'/1'/0'/0/7")
     to_priv = hdw.get_private_key()
-    print('To Private key', to_priv.to_wif())
+    print('Send to Private key', to_priv.to_wif())
     to_pub = to_priv.get_public_key()
-    print('To Public key', to_pub.to_hex())
 
-    # taproot script is a simple P2PK with the following keys
+    # taproot script A is a simple P2PK with the following keys
+    privkey_tr_script_A = PrivateKey('cSW2kQbqC9zkqagw8oTYKFTozKuZ214zd6CMTDs4V32cMfH3dgKa')
+    pubkey_tr_script_A = privkey_tr_script_A.get_public_key()
+    tr_script_p2pk_A = Script([pubkey_tr_script_A.to_x_only_hex(), 'OP_CHECKSIG'])
 
-    # tapleaf script p2pk script
-    privkey_tr_script = PrivateKey('cQwzrJyTNWbEwhPEmQ3Qoo4jSfHdHEtdbL4kNBgHUKhirgzcQw7G')
-    pubkey_tr_script = privkey_tr_script.get_public_key()
+    # taproot script B is a simple P2PK with the following keys
+    privkey_tr_script_B = PrivateKey('cSv48xapaqy7fPs8VvoSnxNBNA2jpjcuURRqUENu3WVq6Eh4U3JU')
+    pubkey_tr_script_B = privkey_tr_script_B.get_public_key()
+    tr_script_p2pk_B = Script([pubkey_tr_script_B.to_x_only_hex(), 'OP_CHECKSIG'])
 
-    tr_script_p2pk = Script([pubkey_tr_script.to_x_only_hex(), 'OP_CHECKSIG'])
+    # taproot script C is a simple P2PK with the following keys
+    privkey_tr_script_C = PrivateKey('cRkZPNnn3jdr64o3PDxNHG68eowDfuCdcyL6nVL4n3czvunuvryC')
+    pubkey_tr_script_C = privkey_tr_script_C.get_public_key()
+    tr_script_p2pk_C = Script([pubkey_tr_script_C.to_x_only_hex(), 'OP_CHECKSIG'])
+
+    # tapleafs in order
+    #                  TB_ABC
+    #                  /    \
+    #                 /      \
+    #              TB_AB      \
+    #               / \        \
+    #              /   \        \
+    #            TL_A TL_B     TL_C
+    all_leafs = [ [tr_script_p2pk_A, tr_script_p2pk_B], tr_script_p2pk_C ]
 
     # taproot script path address
-    to_address = to_pub.get_taproot_address([ [tr_script_p2pk] ])
+    to_address = to_pub.get_taproot_address(all_leafs)
     print('To Taproot script address', to_address.to_string())
 
     # create transaction output
-    tx_out = TxOutput(to_satoshis(0.00009), to_address.to_script_pub_key())
+    tx_out = TxOutput(to_satoshis(0.000035), to_address.to_script_pub_key())
 
     # create transaction without change output - if at least a single input is
     # segwit we need to set has_segwit=True
@@ -97,7 +109,6 @@ def main():
 
     print("\nSize:", tx.get_size())
     print("\nvSize:", tx.get_vsize())
-
 
 if __name__ == "__main__":
     main()
