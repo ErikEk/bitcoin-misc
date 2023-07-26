@@ -120,8 +120,5 @@ def main():
     print("\nTxId:", tx.get_txid())
     print("\nTxwId:", tx.get_wtxid())
 
-    print("\nSize:", tx.get_size())
-    print("\nvSize:", tx.get_vsize())
-
 if __name__ == "__main__":
     main()
