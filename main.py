@@ -8,7 +8,6 @@ from bitcoinutils.keys import PrivateKey
 from bitcoinutils.hdwallet import HDWallet
 
 def main():
-    # always remember to setup the network
     setup('testnet')
 
     # Keys are hard-coded in the example for simplicity but it is very bad
